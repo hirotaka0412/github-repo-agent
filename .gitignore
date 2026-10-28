@@ -1,0 +1,16 @@
+# API keys
+.env
+.env.*
+!.env.example
+
+# python
+_pycache_/
+*.pyc
+.venv/
+venv/
+
+# Google ADK
+.adk/
+
+#Editor
+.vscode/
