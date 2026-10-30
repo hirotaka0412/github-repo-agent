@@ -1,8 +1,9 @@
-# GitHub APIへのアクセスと情報取得
+# 1.GitHub APIへのアクセスと情報取得
 import base64
 import re
 import requests
 from urllib.parse import urlparse
+from google.adk.tools.tool_context import ToolContext
 
 GITHUB_API = "https://api.github.com"
 
@@ -35,7 +36,10 @@ def parse_github_url(github_url: str) -> tuple[str, str]:
     return owner, repo
 
 
-def get_github_repo_info(github_url: str) -> dict:
+def get_github_repo_info(
+        github_url: str,
+        tool_context: ToolContext,
+        ) -> dict:
     """公開GitHubリポジトリの概要・README・トップ階層を取得する。
 
     Args:
@@ -92,7 +96,7 @@ def get_github_repo_info(github_url: str) -> dict:
         if len(readme) > 12000:
             readme = readme[:12000] + "\n...(省略)"
 
-        return {
+        result = {
             "status": "success",
             "name": repo_data["full_name"],
             "description": repo_data.get("description"),
@@ -102,6 +106,13 @@ def get_github_repo_info(github_url: str) -> dict:
             "files": files[:100],
             "readme": readme,
         }
+
+        # 取得に成功したときのみ調査対象を更新する
+        tool_context.state["current_repo_url"] = (
+            f"https://github.com/{owner}/{repo}"
+        )
+        tool_context.state["current_repo_info"] = result
+        return result
 
     except requests.exceptions.HTTPError as e:
         status = e.response.status_code
@@ -120,3 +131,41 @@ def get_github_repo_info(github_url: str) -> dict:
             "status": "error",
             "message": "GitHubへの通信に失敗しました。",
         }
+
+# 2.保存済み情報を読むツール
+def get_current_repo(tool_context: ToolContext)->dict:
+    repo_info = tool_context.state.get("current_repo_info")
+
+    if repo_info is None:
+        return {
+            "states": "not_found",
+            "message": "調査するGitHubレポジトリのURLを教えてください。",
+        }
+    return {
+        "status": "success",
+        "url": tool_context.state.get("current_repo_url"),
+        "repo_info": repo_info,
+    }
+
+# 別Sessionでも共有するユーザー設定を追加
+def save_learning_level(
+        learning_level: str,
+        tool_context: ToolContext,
+) -> dict:
+    # ユーザーのGit習熟度を保存する。初心者・中級者・上級者から選択
+    if learning_level not in ("初心者","中級者","上級者"):
+        return {
+            "status": "error",
+            "message": "初心者・中級者・上級者から選んでください。",
+        }
+    tool_context.state["user:learning_level"] = learning_level
+    return {"status": "success", "learning_level": learning_level}
+
+def get_learning_level(tool_context: ToolContext) -> dict:
+    # 保存済みのGit習熟度を取得する。
+    return {
+        "learning_level": tool_context.state.get(
+            "user:learning_level", "未設定"
+        )
+
+    }
