@@ -4,6 +4,10 @@ from google.adk.agents import Agent
 from .github_tools import get_github_repo_info,get_current_repo, save_learning_level, get_learning_level
 from google.adk.sessions import InMemorySessionService
 from google.adk.apps.app import App, EventsCompactionConfig
+from google.adk.tools import preload_memory
+# Memory検索と自動保存
+async def auto_save_to_memory(callback_context):
+	await callback_context.add_session_to_memory()
 
 # day3a Sessionの実装
 # 以下ユーザー情報
@@ -37,8 +41,13 @@ root_agent = Agent(
 	GitやGitHubの説明前にはget_learning_levelで習熟度を確認し、
 	説明の詳しさを調整してください。
 	未設定の場合は初心者向けに説明してください。
+
+	過去の調査内容について質問された場合は、Memoryの検索結果を参考にしてください。
+	現在のリポジトリ情報が必要な場合は、GitHubの取得ツールで確認してください。
 	""",
-	tools = [get_github_repo_info,get_current_repo,save_learning_level, get_learning_level],
+	tools = [get_github_repo_info,get_current_repo,save_learning_level, get_learning_level,preload_memory
+	],
+	after_agent_callback=auto_save_to_memory,
 )
 
 # root_agentを包むAppに、履歴の圧縮を設定する。
