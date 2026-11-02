@@ -138,7 +138,7 @@ def get_current_repo(tool_context: ToolContext)->dict:
 
     if repo_info is None:
         return {
-            "states": "not_found",
+            "status": "not_found",
             "message": "調査するGitHubレポジトリのURLを教えてください。",
         }
     return {

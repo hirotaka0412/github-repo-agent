@@ -14,3 +14,7 @@ venv/
 
 #Editor
 .vscode/
+
+# Observability
+logs/
+*.log

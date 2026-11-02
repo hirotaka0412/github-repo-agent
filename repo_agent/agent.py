@@ -4,6 +4,10 @@ from google.adk.agents import Agent
 from .github_tools import get_github_repo_info,get_current_repo, save_learning_level, get_learning_level
 from google.adk.sessions import InMemorySessionService
 from google.adk.apps.app import App, EventsCompactionConfig
+
+from google.adk.plugins.logging_plugin import LoggingPlugin
+from .observability_plugin import RepoObservabilityPlugin
+
 from google.adk.tools import preload_memory
 # Memory検索と自動保存
 async def auto_save_to_memory(callback_context):
@@ -54,6 +58,12 @@ root_agent = Agent(
 app = App(
 	name = "repo_agent",
 	root_agent = root_agent,
+
+	plugins=[
+		LoggingPlugin(),
+		RepoObservabilityPlugin(),
+	],
+	
 	events_compaction_config = EventsCompactionConfig(
 		# 3回の呼び出しごとに履歴を圧縮
 		compaction_interval = 3,
