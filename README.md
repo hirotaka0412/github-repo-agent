@@ -11,6 +11,7 @@ kaggleの「5-Day AI Agents Intensive Course with Google」に並行して独自
 - Gemini APIとの接続
 - ADK Web UIを使用した対話
 - URLからGitHubレポジトリの情報を取得
+- ユーザーの情報を保存
 
 # day1 geminiAPI + GoogleADKで基本機能を実装
 基礎となるファイル構成を実装し、APIキーやGoogleADKを使用可能な状態にする。
@@ -21,7 +22,10 @@ GitHub APIにアクセスするPython関数をADKのツールとして登録す�
 ->GitHubのURLから情報を入手するツールを作成し、回答を作成できるようになった。
 
 # day3 会話履歴とMemoryの実装(Session, Memory)
-エージェントに、現在調査しているレポジトリや過去の分析結果を記憶させる。
+エージェントに、現在調査しているレポジトリや過去の分析結果を記憶させる。\\
+day3a:Sessionの実装完了。同じセッション内の文脈保持とユーザーの固有情報を保存できるようになった。
+
+day3b:Memoryの実装完了。Sessionをまたいだ情報の保存ができるようになった。
 
 # day4 エージェントの評価・改善(Agent Quality)
 エージェントが正確にコードを理解できているか評価する。
