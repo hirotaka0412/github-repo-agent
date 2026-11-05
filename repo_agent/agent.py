@@ -7,8 +7,21 @@ from google.adk.apps.app import App, EventsCompactionConfig
 
 from google.adk.plugins.logging_plugin import LoggingPlugin
 from .observability_plugin import RepoObservabilityPlugin
-
+from google.adk.a2a.utils.agent_to_a2a import to_a2a
 from google.adk.tools import preload_memory
+
+
+from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+from google.adk.tools.agent_tool import AgentTool
+
+# 別プロセスの子エージェントを、親が呼べるツールにする。
+code_explorer_tool = AgentTool(agent=RemoteA2aAgent(
+	name="code_explorer",
+	description="GitHubのコード本文を調べ、処理や構造を根拠付きで説明する。",
+	agent_card="http://127.0.0.1:8002/.well-known/agent-card.json",
+))
+
+
 # Memory検索と自動保存
 async def auto_save_to_memory(callback_context):
 	await callback_context.add_session_to_memory()
@@ -48,11 +61,19 @@ root_agent = Agent(
 
 	過去の調査内容について質問された場合は、Memoryの検索結果を参考にしてください。
 	現在のリポジトリ情報が必要な場合は、GitHubの取得ツールで確認してください。
+	コードの実装、実行入口、下位ディレクトリ、関数の役割を調べる場合はcode_explorerツールを使ってください。
+	依頼には必ずGitHubリポジトリのURLと具体的な質問を含めてください。
+	URLが省略されていたらget_current_repoで確認し、未設定ならユーザーに確認してください。
+	子が返した根拠と未確認事項を保ち、ユーザーの習熟度に合わせて説明してください。
+	子に接続できない場合はその旨を伝え、コード本文を確認したように答えないでください。
 	""",
-	tools = [get_github_repo_info,get_current_repo,save_learning_level, get_learning_level,preload_memory
+	tools = [get_github_repo_info,get_current_repo,save_learning_level, get_learning_level,preload_memory,code_explorer_tool
 	],
 	after_agent_callback=auto_save_to_memory,
 )
+
+# repo_agentをほかのエージェントから呼び出せるようにするための処理
+a2a_app = to_a2a(root_agent, port=8001)
 
 # root_agentを包むAppに、履歴の圧縮を設定する。
 app = App(
