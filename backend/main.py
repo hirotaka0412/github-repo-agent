@@ -4,6 +4,10 @@ import logging
 # 環境変数ファイルを読み込むためのライブラリ
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+
+# ディレクトリから静的ファイルを自動的に提供
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 """
 FastAPI: Python製のWebフレームワーク
 - 非同期処理に対応
@@ -57,3 +61,13 @@ async def chat(request: ChatRequest):
 			detail = "エージェントの実行中にエラーが発生しました。"
 		)
 	return ChatResponse(answer = answer)
+
+# Reactのビルド結果を配信する
+frontend_dist = Path(__file__).resolve().parents[1] / "frontend" / "dist"
+
+if frontend_dist.is_dir():
+	app.mount(
+		"/",
+		StaticFiles(directory=str(frontend_dist), html = True),
+		name="frontend",
+	)

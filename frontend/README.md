@@ -1,16 +1,44 @@
-# React + Vite
+﻿# GitLearn フロントエンド
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+公開 GitHub リポジトリの URL と質問を入力し、調査結果を表示する最小構成の React 画面です。質問ごとに独立した調査を行います。回答は改行を保持したプレーンテキストで表示します。
 
-Currently, two official plugins are available:
+## ローカルで起動
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+PowerShell のターミナル1で、認証済みの Cloud Run プロキシを起動します。
 
-## React Compiler
+```powershell
+gcloud run services proxy gitlearn --region=asia-northeast1 --project=gitlearn-hirot-20261106 --port=19090
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+ターミナル2で画面を起動します。
 
-## Expanding the ESLint configuration
+```powershell
+Set-Location C:\Users\hirot\Projects_local\kaggle\gitLearn\frontend
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Vite が表示した URL を開いてください。画面だけの確認はプロキシなしでもできます。質問送信にはプロキシが必要です。Gemini API キーをフロントエンドに設定する必要はありません。
+
+## ローカル FastAPI に接続する場合
+
+`frontend/.env.local` に次を設定し、Vite を再起動します。ポートは実際の起動ポートに合わせてください。
+
+```dotenv
+API_PROXY_TARGET=http://127.0.0.1:18080
+```
+
+既定の接続先は `http://127.0.0.1:19090` です。`/api` は Vite の開発サーバーから転送されます。
+
+## 確認
+
+```powershell
+npm run lint
+npm run build
+```
+
+`npm run preview` は画面のビルド確認用です。開発用 API プロキシは `npm run dev` で有効です。
+
+## 公開について
+
+今回はフロントエンドのみを実装しています。Cloud Run への画面配信には、Dockerfile で React をビルドして FastAPI から `dist` を配信する設定を別途追加します。ブラウザは同一オリジンの `/api/chat` を呼ぶため、公開先でもそのルートが必要です。
