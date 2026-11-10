@@ -2,6 +2,9 @@
 
 kaggleの「5-Day AI Agents Intensive Course with Google」に並行して独自で作成したAIエージェントです。day1からday5にかけて少しずつ内容を追加しています。完成したエージェントを利用できるWebアプリを作成し、クラウド上に公開しました。URLは<https://gitlearn-sna2kumn6a-an.a.run.app>です。
 
+## デモ映像
+以下が実際にエージェントを使用したときの画面です。返答待ちの時間は1分ほどでした。
+<https://github.com/hirotaka0412/github-repo-agent/issues/1#issue-6297599995>
 
 ## ローカルでの起動方法
 
@@ -138,10 +141,6 @@ flowchart TD
 7. バックエンドが最終回答を`{"answer":"回答本文"}`の形式で返し、Reactが表示します。現在は回答全体の完成後に表示する方式です。
 
 画面のHTML・JavaScript・CSSもFastAPIが`frontend/dist`から配信します。Web版のSession・Memoryはリクエストごとに作成するため、質問間で会話履歴は引き継ぎません。
-
-## デモ映像
-以下が実際にエージェントを使用したときの画面です。返答待ちの時間は1分ほどでした。
-<https://github.com/hirotaka0412/github-repo-agent/issues/1#issue-6297599995>
 
 ## デプロイ方法
 
