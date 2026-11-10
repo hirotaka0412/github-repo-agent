@@ -1,7 +1,7 @@
 # APIで受け取るデータと返すデータを定義する.
 # ReactとはJsonを送受信
 
-# データ構造化を容易にするライブラリから
+# データ構造化を容易にするライブラリ
 from pydantic import BaseModel, Field
 
 class ChatRequest(BaseModel):

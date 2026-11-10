@@ -1,5 +1,8 @@
-# HTTPリクエストを受信
+﻿# HTTPリクエストを受信
 import logging
+import os
+
+from backend.shared_auth import SharedPasswordMiddleware
 
 # 環境変数ファイルを読み込むためのライブラリ
 from dotenv import load_dotenv
@@ -31,6 +34,14 @@ app = FastAPI(
 	version="1.0.0",
 )
 
+# The same authentication protects the frontend, API, and API documentation.
+# Keep Cloud Run IAM authentication until this version and its secret are deployed.
+app.add_middleware(
+    SharedPasswordMiddleware,
+    username=os.getenv("SHARED_USERNAME", "guest"),
+    password=os.getenv("SHARED_PASSWORD", ""),
+    external_scheme="https" if os.getenv("K_SERVICE") else None,
+)
 # APIサーバーが起動しているか確認
 @app.get("/api/health")
 async def health_check():

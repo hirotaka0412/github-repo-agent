@@ -42,3 +42,6 @@ npm run build
 ## 公開について
 
 今回はフロントエンドのみを実装しています。Cloud Run への画面配信には、Dockerfile で React をビルドして FastAPI から `dist` を配信する設定を別途追加します。ブラウザは同一オリジンの `/api/chat` を呼ぶため、公開先でもそのルートが必要です。
+
+共通パスワード付き公開の手順は [共有手順](../docs/shared-access.md) を参照してください。ローカル FastAPI にも SHARED_PASSWORD（16文字以上）の設定が必要です。
+
